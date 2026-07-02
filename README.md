@@ -41,9 +41,10 @@ Os dados ficam salvos localmente no dispositivo. ⚠ Na versão web as **notific
 ### Republicar a versão web
 
 ```bash
-npx expo export --platform web
-npx gh-pages -d dist
+npm run deploy:web
 ```
+
+(O script gera o build, cria o `.nojekyll` — sem ele o GitHub Pages bloqueia a pasta `_expo/` — e publica na branch `gh-pages`.)
 
 ## Rodando o projeto (nativo)
 

@@ -32,6 +32,7 @@
     "typescript": "~6.0.3"
   },
   "scripts": {
+    "deploy:web": "expo export --platform web && node scripts/deploy-web.mjs",
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",

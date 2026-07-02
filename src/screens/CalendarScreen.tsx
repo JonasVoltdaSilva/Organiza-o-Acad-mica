@@ -126,40 +126,39 @@ export function CalendarScreen() {
                 haptic={null}
                 style={styles.cellWrap}
               >
-                <View
-                  style={[
-                    styles.cell,
-                    isSelected && { backgroundColor: theme.accent },
-                    !isSelected && today && { backgroundColor: theme.primarySoft },
-                  ]}
-                >
-                  <Text
+                <View style={styles.cell}>
+                  <View
                     style={[
-                      typography.body,
-                      {
-                        color: isSelected
-                          ? theme.accentText
-                          : inMonth
-                            ? theme.text
-                            : theme.textMuted,
-                        fontWeight: today || isSelected ? "800" : "500",
-                      },
+                      styles.dayCircle,
+                      isSelected && { backgroundColor: theme.accent },
+                      !isSelected &&
+                        today && {
+                          borderWidth: 1.5,
+                          borderColor: theme.primary,
+                        },
                     ]}
                   >
-                    {format(day, "d")}
-                  </Text>
+                    <Text
+                      style={[
+                        typography.caption,
+                        {
+                          color: isSelected
+                            ? theme.accentText
+                            : inMonth
+                              ? theme.text
+                              : theme.textMuted,
+                          fontWeight: today || isSelected ? "800" : "600",
+                        },
+                      ]}
+                    >
+                      {format(day, "d")}
+                    </Text>
+                  </View>
                   <View style={styles.dotsRow}>
                     {dots.map((color, index) => (
                       <View
                         key={index}
-                        style={[
-                          styles.dot,
-                          {
-                            backgroundColor: isSelected
-                              ? theme.accentText
-                              : color,
-                          },
-                        ]}
+                        style={[styles.dot, { backgroundColor: color }]}
                       />
                     ))}
                   </View>
@@ -231,20 +230,29 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   monthLabel: { textTransform: "capitalize" },
-  weekHeader: { flexDirection: "row", marginBottom: spacing.sm },
-  weekHeaderCell: { flex: 1, textAlign: "center" },
+  weekHeader: { flexDirection: "row", marginBottom: spacing.xs },
+  weekHeaderCell: { width: `${100 / 7}%`, textAlign: "center" },
   grid: { flexDirection: "row", flexWrap: "wrap" },
   cellWrap: { width: `${100 / 7}%` },
   cell: {
     alignItems: "center",
-    paddingVertical: spacing.sm,
-    marginVertical: 2,
-    marginHorizontal: 2,
-    borderRadius: radius.sm,
-    gap: 2,
-    minHeight: 44,
+    paddingVertical: 3,
+    minHeight: 46,
   },
-  dotsRow: { flexDirection: "row", gap: 3, minHeight: 5 },
+  dayCircle: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  dotsRow: {
+    flexDirection: "row",
+    gap: 3,
+    height: 6,
+    marginTop: 1,
+    alignItems: "center",
+  },
   dot: { width: 5, height: 5, borderRadius: 3 },
   holidayCard: { marginBottom: spacing.md },
   holidayRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm },

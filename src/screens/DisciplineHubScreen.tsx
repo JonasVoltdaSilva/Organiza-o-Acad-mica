@@ -5,7 +5,7 @@ import {
   useRoute,
 } from "@react-navigation/native";
 import React from "react";
-import { Alert, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { ActivityRow } from "../components/cards/ActivityRow";
 import { ExamCard } from "../components/cards/ExamCard";
@@ -23,6 +23,7 @@ import { RootNavigation, RootStackParamList } from "../navigation/types";
 import { useApp } from "../providers/AppProvider";
 import { radius, spacing, typography } from "../theme/layout";
 import { useTheme } from "../theme/ThemeProvider";
+import { confirmAction } from "../utils/confirm";
 import { formatShortDate } from "../utils/dates";
 
 type HubRoute = RouteProp<RootStackParamList, "DisciplineHub">;
@@ -49,20 +50,14 @@ export function DisciplineHubScreen() {
   const { discipline } = hub;
 
   const confirmDelete = () => {
-    Alert.alert(
+    confirmAction(
       "Excluir disciplina",
       `Excluir "${discipline.name}" e todos os dados relacionados?`,
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Excluir",
-          style: "destructive",
-          onPress: () => {
-            deleteDiscipline(discipline.id);
-            navigation.goBack();
-          },
-        },
-      ],
+      "Excluir",
+      () => {
+        deleteDiscipline(discipline.id);
+        navigation.goBack();
+      },
     );
   };
 

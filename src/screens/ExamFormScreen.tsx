@@ -17,6 +17,7 @@ import { RootStackParamList } from "../navigation/types";
 import { useApp } from "../providers/AppProvider";
 import { radius, spacing, typography } from "../theme/layout";
 import { useTheme } from "../theme/ThemeProvider";
+import { showMessage } from "../utils/confirm";
 import { createId } from "../utils/id";
 
 type FormRoute = RouteProp<RootStackParamList, "ExamForm">;
@@ -47,7 +48,25 @@ export function ExamFormScreen() {
   const valid = content.trim().length > 0 && !!disciplineId && !!dateISO;
 
   const save = async () => {
-    if (!valid || !disciplineId || !dateISO) return;
+    if (!disciplineId) {
+      showMessage(
+        "Falta a disciplina",
+        "Selecione (ou crie) a disciplina desta prova.",
+      );
+      return;
+    }
+    if (!content.trim()) {
+      showMessage("Falta o conteúdo", "Descreva o conteúdo da prova.");
+      return;
+    }
+    if (!dateISO) {
+      showMessage(
+        "Falta a data",
+        "Preencha a data da prova no formato dd/mm/aaaa.",
+      );
+      return;
+    }
+    if (!valid) return;
     await upsertExam({
       id: existing?.id ?? createId(),
       disciplineId,

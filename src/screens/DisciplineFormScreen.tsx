@@ -21,6 +21,7 @@ import { useApp } from "../providers/AppProvider";
 import { radius, spacing, typography } from "../theme/layout";
 import { disciplineColors, disciplineIcons } from "../theme/palette";
 import { useTheme } from "../theme/ThemeProvider";
+import { showMessage } from "../utils/confirm";
 import { createId } from "../utils/id";
 
 type FormRoute = RouteProp<RootStackParamList, "DisciplineForm">;
@@ -56,6 +57,17 @@ export function DisciplineFormScreen() {
   const valid = name.trim().length > 0 && Number(workload) > 0;
 
   const save = () => {
+    if (!name.trim()) {
+      showMessage("Falta o nome", "Dê um nome para a disciplina.");
+      return;
+    }
+    if (!(Number(workload) > 0)) {
+      showMessage(
+        "Falta a carga horária",
+        "Informe a carga horária em horas (ex.: 32, 64, 96).",
+      );
+      return;
+    }
     if (!valid) return;
     upsertDiscipline({
       id: existing?.id ?? createId(),

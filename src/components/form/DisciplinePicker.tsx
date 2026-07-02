@@ -1,10 +1,14 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
+import { RootNavigation } from "../../navigation/types";
 import { useApp } from "../../providers/AppProvider";
-import { spacing, typography } from "../../theme/layout";
+import { radius, spacing, typography } from "../../theme/layout";
 import { useTheme } from "../../theme/ThemeProvider";
 import { Chip } from "../ui/Chip";
+import { PressableScale } from "../ui/PressableScale";
 
 interface DisciplinePickerProps {
   selectedId: string | null;
@@ -13,6 +17,7 @@ interface DisciplinePickerProps {
 
 export function DisciplinePicker({ selectedId, onChange }: DisciplinePickerProps) {
   const theme = useTheme();
+  const navigation = useNavigation<RootNavigation>();
   const { state } = useApp();
 
   return (
@@ -21,9 +26,24 @@ export function DisciplinePicker({ selectedId, onChange }: DisciplinePickerProps
         DISCIPLINA
       </Text>
       {state.disciplines.length === 0 ? (
-        <Text style={[typography.caption, { color: theme.textMuted }]}>
-          Cadastre uma disciplina primeiro.
-        </Text>
+        <PressableScale
+          onPress={() => navigation.navigate("DisciplineForm", {})}
+        >
+          <View style={[styles.cta, { backgroundColor: theme.primarySoft }]}>
+            <Ionicons name="add-circle" size={20} color={theme.primary} />
+            <View style={styles.ctaText}>
+              <Text
+                style={[typography.body, { color: theme.primary, fontWeight: "700" }]}
+              >
+                Criar sua primeira disciplina
+              </Text>
+              <Text style={[typography.caption, { color: theme.textSecondary }]}>
+                É necessário ter uma disciplina para salvar.
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={16} color={theme.primary} />
+          </View>
+        </PressableScale>
       ) : (
         <View style={styles.chips}>
           {state.disciplines.map((discipline) => (
@@ -45,4 +65,12 @@ const styles = StyleSheet.create({
   wrap: { marginBottom: spacing.lg },
   label: { marginBottom: spacing.sm, marginLeft: spacing.xs },
   chips: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
+  cta: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    padding: spacing.lg,
+    borderRadius: radius.sm,
+  },
+  ctaText: { flex: 1, gap: 2 },
 });

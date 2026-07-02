@@ -49,7 +49,7 @@ export function FormSheet({
         <Text style={[typography.heading, { color: theme.text }]} numberOfLines={1}>
           {title}
         </Text>
-        <PressableScale onPress={onSave} disabled={!saveEnabled}>
+        <PressableScale onPress={onSave}>
           <View
             style={[
               styles.saveButton,

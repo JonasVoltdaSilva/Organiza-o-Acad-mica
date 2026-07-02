@@ -20,6 +20,7 @@ import { useApp } from "../providers/AppProvider";
 import { radius, spacing, typography } from "../theme/layout";
 import { useTheme } from "../theme/ThemeProvider";
 import { Attachment, ChecklistItem, Priority } from "../types";
+import { showMessage } from "../utils/confirm";
 import { createId } from "../utils/id";
 
 type FormRoute = RouteProp<RootStackParamList, "ActivityForm">;
@@ -61,7 +62,25 @@ export function ActivityFormScreen() {
   const valid = title.trim().length > 0 && !!disciplineId && !!dueISO;
 
   const save = async () => {
-    if (!valid || !disciplineId || !dueISO) return;
+    if (!title.trim()) {
+      showMessage("Falta o título", "Dê um nome para a atividade.");
+      return;
+    }
+    if (!disciplineId) {
+      showMessage(
+        "Falta a disciplina",
+        "Selecione (ou crie) a disciplina desta atividade.",
+      );
+      return;
+    }
+    if (!dueISO) {
+      showMessage(
+        "Falta a data de entrega",
+        "Preencha a data no formato dd/mm/aaaa.",
+      );
+      return;
+    }
+    if (!valid) return;
     await upsertActivity({
       id: existing?.id ?? createId(),
       disciplineId,

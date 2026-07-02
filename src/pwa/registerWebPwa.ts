@@ -78,6 +78,20 @@ export function registerWebPwa(): void {
         padding-top: env(safe-area-inset-top);
         padding-bottom: env(safe-area-inset-bottom);
       }
+      /* Em telas largas (desktop), o app vira uma coluna central
+         com largura de celular — como um app de verdade. */
+      @media (min-width: 700px) {
+        body { background: #E9ECDD; }
+        #root {
+          max-width: 480px;
+          margin: 0 auto;
+          box-shadow: 0 0 60px rgba(0, 31, 63, 0.18);
+        }
+      }
+      @media (min-width: 700px) and (prefers-color-scheme: dark) {
+        body { background: #05090F; }
+        #root { box-shadow: 0 0 60px rgba(0, 0, 0, 0.6); }
+      }
     `;
     document.head.appendChild(style);
   }

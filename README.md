@@ -22,7 +22,30 @@ Cada disciplina funciona como um **mini ambiente acadêmico próprio** (Hub da D
 - **Visual premium**: glassmorphism, animações spring 60fps (Reanimated), feedback tátil, tema claro/escuro.
 - **Dados locais**: persistência offline com AsyncStorage.
 
-## Rodando o projeto
+## Usar no navegador (GitHub Pages)
+
+A versão web fica publicada em:
+
+**https://jonasvoltdasilva.github.io/Organiza-o-Acad-mica/**
+
+### 📌 Instalar na área de trabalho / tela inicial
+
+O HubAcad é um **PWA** — pode ser instalado como um app de verdade:
+
+- **No PC (Chrome/Edge)**: abra o link acima e clique no ícone de **instalar** (⊕) na barra de endereço, ou menu ⋮ → *Instalar HubAcad*. Ele vira um app com atalho na área de trabalho, janela própria e funciona offline.
+- **No Android (Chrome)**: menu ⋮ → *Adicionar à tela inicial* → *Instalar*.
+- **No iPhone (Safari)**: botão compartilhar → *Adicionar à Tela de Início*.
+
+Os dados ficam salvos localmente no dispositivo. ⚠ Na versão web as **notificações de lembrete não funcionam** — para lembretes, use a versão nativa (Expo Go ou build Android/iOS).
+
+### Republicar a versão web
+
+```bash
+npx expo export --platform web
+npx gh-pages -d dist
+```
+
+## Rodando o projeto (nativo)
 
 ```bash
 npm install

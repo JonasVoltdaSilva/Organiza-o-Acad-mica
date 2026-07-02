@@ -1,6 +1,6 @@
 import * as Haptics from "expo-haptics";
 import React from "react";
-import { Pressable, StyleProp, ViewStyle } from "react-native";
+import { Platform, Pressable, StyleProp, ViewStyle } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -45,7 +45,7 @@ export function PressableScale({
         scale.value = withSpring(1, { damping: 14, stiffness: 220 });
       }}
       onPress={() => {
-        if (haptic && state.settings.hapticsEnabled) {
+        if (haptic && state.settings.hapticsEnabled && Platform.OS !== "web") {
           Haptics.impactAsync(haptic);
         }
         onPress?.();

@@ -1,16 +1,22 @@
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
+/** expo-notifications não é suportado na web — tudo vira no-op lá. */
+const isWeb = Platform.OS === "web";
+
+if (!isWeb) {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowBanner: true,
+      shouldShowList: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+    }),
+  });
+}
 
 export async function ensureNotificationPermission(): Promise<boolean> {
+  if (isWeb) return false;
   const current = await Notifications.getPermissionsAsync();
   if (current.granted) return true;
   const requested = await Notifications.requestPermissionsAsync();
@@ -18,7 +24,7 @@ export async function ensureNotificationPermission(): Promise<boolean> {
 }
 
 export async function setupNotificationChannel(): Promise<void> {
-  if (Platform.OS !== "android") return;
+  if (isWeb || Platform.OS !== "android") return;
   await Notifications.setNotificationChannelAsync("prazos", {
     name: "Prazos e provas",
     importance: Notifications.AndroidImportance.HIGH,
@@ -59,6 +65,7 @@ export async function scheduleReminders({
   reminders,
   groupId,
 }: ScheduleParams): Promise<string[]> {
+  if (isWeb) return [];
   const granted = await ensureNotificationPermission();
   if (!granted) return [];
 
@@ -96,6 +103,7 @@ export async function scheduleOverdueReminder(
   title: string,
   groupId: string,
 ): Promise<string | null> {
+  if (isWeb) return null;
   const granted = await ensureNotificationPermission();
   if (!granted) return null;
 
@@ -116,6 +124,7 @@ export async function scheduleOverdueReminder(
 }
 
 export async function cancelReminders(ids: string[]): Promise<void> {
+  if (isWeb) return;
   await Promise.all(
     ids.map((id) =>
       Notifications.cancelScheduledNotificationAsync(id).catch(() => {}),

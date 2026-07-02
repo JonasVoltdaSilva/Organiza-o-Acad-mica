@@ -1,0 +1,26 @@
+{
+  "name": "HubAcad — Organização Acadêmica",
+  "short_name": "HubAcad",
+  "description": "Hub acadêmico completo: atividades, provas, notas, frequência e anotações por disciplina.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F6F7ED",
+  "theme_color": "#F6F7ED",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "./pwa-icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./pwa-icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

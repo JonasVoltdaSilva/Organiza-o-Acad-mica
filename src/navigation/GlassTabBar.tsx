@@ -34,7 +34,7 @@ export function GlassTabBar({ state, navigation }: BottomTabBarProps) {
             accessibilityLabel={route.name}
             style={styles.tab}
             onPress={() => {
-              Haptics.selectionAsync();
+              if (Platform.OS !== "web") Haptics.selectionAsync();
               if (!focused) navigation.navigate(route.name as never);
             }}
           >

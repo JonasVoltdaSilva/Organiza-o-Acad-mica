@@ -32,7 +32,7 @@ export function NextDeadlineCard({
             <Ionicons
               name={kind === "prova" ? "document-text" : "flag"}
               size={13}
-              color={brand.navy}
+              color={brand.cream}
             />
             <Text style={styles.badgeText}>
               {kind === "prova" ? "PRÓXIMA PROVA" : "PRÓXIMA ENTREGA"}
@@ -51,14 +51,14 @@ export function NextDeadlineCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: brand.lime,
-    borderRadius: radius.lg,
+    backgroundColor: brand.greenDark,
+    borderRadius: radius.xl,
     padding: spacing.xl,
     gap: spacing.sm,
     shadowColor: brand.navy,
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.18,
-    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.16,
+    shadowRadius: 22,
     elevation: 6,
   },
   badgeRow: {
@@ -70,17 +70,26 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
-    backgroundColor: "rgba(255,255,255,0.55)",
+    backgroundColor: "rgba(255,255,255,0.18)",
     paddingHorizontal: spacing.md,
     paddingVertical: 5,
     borderRadius: radius.pill,
   },
-  badgeText: { ...typography.micro, color: brand.navy },
-  countdown: { ...typography.caption, fontWeight: "800", color: brand.navy },
-  title: { ...typography.title, color: brand.navy },
+  badgeText: { ...typography.micro, color: brand.cream },
+  countdown: {
+    ...typography.caption,
+    fontWeight: "800",
+    color: brand.navy,
+    backgroundColor: brand.lime,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 4,
+    borderRadius: radius.pill,
+    overflow: "hidden",
+  },
+  title: { ...typography.title, color: "#FFFFFF" },
   date: {
     ...typography.caption,
-    color: "rgba(0,31,63,0.65)",
+    color: "rgba(246,247,237,0.78)",
     textTransform: "capitalize",
   },
 });

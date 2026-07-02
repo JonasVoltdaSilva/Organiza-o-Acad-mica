@@ -4,7 +4,7 @@ import {
   useNavigation,
   useRoute,
 } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 
 import { DateTimeField } from "../components/form/DateTimeField";
@@ -60,8 +60,10 @@ export function ActivityFormScreen() {
   );
 
   const valid = title.trim().length > 0 && !!disciplineId && !!dueISO;
+  const savingRef = useRef(false);
 
   const save = async () => {
+    if (savingRef.current) return;
     if (!title.trim()) {
       showMessage("Falta o título", "Dê um nome para a atividade.");
       return;
@@ -81,6 +83,7 @@ export function ActivityFormScreen() {
       return;
     }
     if (!valid) return;
+    savingRef.current = true;
     await upsertActivity({
       id: existing?.id ?? createId(),
       disciplineId,

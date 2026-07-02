@@ -6,6 +6,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { AppState, Platform } from "react-native";
 
 import {
   cancelReminders,
@@ -60,6 +61,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AppData>(emptyData);
   const [ready, setReady] = useState(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const stateRef = useRef(state);
 
   useEffect(() => {
     loadData().then((data) => {
@@ -70,6 +72,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    stateRef.current = state;
     if (!ready) return;
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => saveData(state), 300);
@@ -77,6 +80,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (saveTimer.current) clearTimeout(saveTimer.current);
     };
   }, [state, ready]);
+
+  // Flush imediato ao sair/minimizar, para não perder a última alteração
+  // feita dentro da janela de debounce de 300ms.
+  useEffect(() => {
+    const flush = () => {
+      saveData(stateRef.current);
+    };
+    if (Platform.OS === "web") {
+      window.addEventListener("beforeunload", flush);
+      window.addEventListener("pagehide", flush);
+      return () => {
+        window.removeEventListener("beforeunload", flush);
+        window.removeEventListener("pagehide", flush);
+      };
+    }
+    const subscription = AppState.addEventListener("change", (status) => {
+      if (status === "background" || status === "inactive") flush();
+    });
+    return () => subscription.remove();
+  }, []);
 
   const upsertDiscipline = useCallback((discipline: Discipline) => {
     setState((s) => ({
@@ -86,23 +109,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const deleteDiscipline = useCallback((id: string) => {
-    setState((s) => {
-      const notificationIds = [
-        ...s.activities.filter((a) => a.disciplineId === id),
-        ...s.exams.filter((e) => e.disciplineId === id),
-      ].flatMap((item) => item.notificationIds);
-      cancelReminders(notificationIds);
-      return {
-        ...s,
-        disciplines: s.disciplines.filter((d) => d.id !== id),
-        activities: s.activities.filter((a) => a.disciplineId !== id),
-        exams: s.exams.filter((e) => e.disciplineId !== id),
-        notes: s.notes.filter((n) => n.disciplineId !== id),
-        assessments: s.assessments.filter((a) => a.disciplineId !== id),
-        absences: s.absences.filter((a) => a.disciplineId !== id),
-        studySessions: s.studySessions.filter((x) => x.disciplineId !== id),
-      };
-    });
+    const current = stateRef.current;
+    const notificationIds = [
+      ...current.activities.filter((a) => a.disciplineId === id),
+      ...current.exams.filter((e) => e.disciplineId === id),
+    ].flatMap((item) => item.notificationIds);
+    cancelReminders(notificationIds);
+    setState((s) => ({
+      ...s,
+      disciplines: s.disciplines.filter((d) => d.id !== id),
+      activities: s.activities.filter((a) => a.disciplineId !== id),
+      exams: s.exams.filter((e) => e.disciplineId !== id),
+      notes: s.notes.filter((n) => n.disciplineId !== id),
+      assessments: s.assessments.filter((a) => a.disciplineId !== id),
+      absences: s.absences.filter((a) => a.disciplineId !== id),
+      studySessions: s.studySessions.filter((x) => x.disciplineId !== id),
+    }));
   }, []);
 
   const upsertActivity = useCallback(
@@ -122,6 +144,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             reminders: activity.reminders,
             groupId: activity.id,
           });
+
+      if (
+        !activity.completed &&
+        new Date(activity.dueISO).getTime() < Date.now()
+      ) {
+        const overdueId = await scheduleOverdueReminder(
+          activity.title,
+          activity.id,
+        );
+        if (overdueId) notificationIds.push(overdueId);
+      }
 
       setState((s) => ({
         ...s,
@@ -179,11 +212,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   );
 
   const deleteActivity = useCallback((id: string) => {
-    setState((s) => {
-      const activity = s.activities.find((a) => a.id === id);
-      if (activity) cancelReminders(activity.notificationIds);
-      return { ...s, activities: s.activities.filter((a) => a.id !== id) };
-    });
+    const activity = stateRef.current.activities.find((a) => a.id === id);
+    if (activity) cancelReminders(activity.notificationIds);
+    setState((s) => ({
+      ...s,
+      activities: s.activities.filter((a) => a.id !== id),
+    }));
   }, []);
 
   const upsertExam = useCallback(
@@ -211,11 +245,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   );
 
   const deleteExam = useCallback((id: string) => {
-    setState((s) => {
-      const exam = s.exams.find((e) => e.id === id);
-      if (exam) cancelReminders(exam.notificationIds);
-      return { ...s, exams: s.exams.filter((e) => e.id !== id) };
-    });
+    const exam = stateRef.current.exams.find((e) => e.id === id);
+    if (exam) cancelReminders(exam.notificationIds);
+    setState((s) => ({ ...s, exams: s.exams.filter((e) => e.id !== id) }));
   }, []);
 
   const upsertNote = useCallback((note: Note) => {

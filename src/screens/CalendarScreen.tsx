@@ -130,19 +130,18 @@ export function CalendarScreen() {
                   <View
                     style={[
                       styles.dayCircle,
-                      isSelected && { backgroundColor: theme.accent },
-                      !isSelected &&
-                        today && {
-                          borderWidth: 1.5,
-                          borderColor: theme.primary,
-                        },
+                      today && { backgroundColor: theme.accent },
+                      isSelected && {
+                        borderWidth: 2,
+                        borderColor: theme.primary,
+                      },
                     ]}
                   >
                     <Text
                       style={[
                         typography.caption,
                         {
-                          color: isSelected
+                          color: today
                             ? theme.accentText
                             : inMonth
                               ? theme.text

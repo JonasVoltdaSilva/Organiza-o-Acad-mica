@@ -21,8 +21,12 @@ function maskDate(text: string): string {
 
 function maskTime(text: string): string {
   const digits = text.replace(/\D/g, "").slice(0, 4);
-  if (digits.length <= 2) return digits;
-  return `${digits.slice(0, 2)}:${digits.slice(2)}`;
+  let hours = digits.slice(0, 2);
+  if (hours.length === 2 && Number(hours) > 23) hours = "23";
+  if (digits.length <= 2) return hours;
+  let minutes = digits.slice(2);
+  if (minutes.length === 2 && Number(minutes) > 59) minutes = "59";
+  return `${hours}:${minutes}`;
 }
 
 /** Campo de data e hora com máscara dd/mm/aaaa · hh:mm. */

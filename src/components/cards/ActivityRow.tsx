@@ -75,7 +75,7 @@ export function ActivityRow({
                   style={[
                     typography.caption,
                     {
-                      color: overdue ? theme.danger : theme.textSecondary,
+                      color: overdue ? theme.warning : theme.textSecondary,
                       fontWeight: overdue ? "700" : "500",
                     },
                   ]}

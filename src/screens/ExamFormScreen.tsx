@@ -4,7 +4,7 @@ import {
   useNavigation,
   useRoute,
 } from "@react-navigation/native";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { DateTimeField } from "../components/form/DateTimeField";
@@ -46,8 +46,10 @@ export function ExamFormScreen() {
   );
 
   const valid = content.trim().length > 0 && !!disciplineId && !!dateISO;
+  const savingRef = useRef(false);
 
   const save = async () => {
+    if (savingRef.current) return;
     if (!disciplineId) {
       showMessage(
         "Falta a disciplina",
@@ -67,6 +69,7 @@ export function ExamFormScreen() {
       return;
     }
     if (!valid) return;
+    savingRef.current = true;
     await upsertExam({
       id: existing?.id ?? createId(),
       disciplineId,

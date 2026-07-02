@@ -56,7 +56,7 @@ export function GlassCard({
       <BlurView
         intensity={intensity ?? theme.blurIntensity}
         tint={theme.blurTint}
-        style={[styles.blur, { backgroundColor: theme.surface, padding }]}
+        style={[styles.blur, { backgroundColor: theme.surfaceStrong, padding }]}
       >
         {children}
       </BlurView>

@@ -37,6 +37,8 @@ export interface EvaluationConfig {
   maxGrade: number;
 }
 
+export type ExternalSource = "moodle" | "suap";
+
 export interface Assessment {
   id: string;
   disciplineId: string;
@@ -44,6 +46,9 @@ export interface Assessment {
   weight: number;
   /** null enquanto a nota não foi lançada */
   grade: number | null;
+  /** presente quando a avaliação veio de uma sincronização externa (SUAP) */
+  externalSource?: ExternalSource;
+  externalId?: string;
 }
 
 export interface AbsenceEntry {
@@ -52,6 +57,18 @@ export interface AbsenceEntry {
   dateISO: string;
   hours: number;
   note?: string;
+  /** presente quando a falta veio de uma sincronização externa (SUAP) */
+  externalSource?: ExternalSource;
+  externalId?: string;
+}
+
+export interface ScheduleSlot {
+  /** dia da semana: 0 = domingo ... 6 = sábado */
+  day: number;
+  /** "HH:mm" */
+  startTime?: string;
+  endTime?: string;
+  room?: string;
 }
 
 export interface Discipline {
@@ -66,9 +83,14 @@ export interface Discipline {
   observations?: string;
   /** dias da semana com aula: 0 = domingo ... 6 = sábado */
   classDays: number[];
+  /** horário detalhado (dia + hora + sala), populado pela sincronização com o SUAP */
+  scheduleSlots?: ScheduleSlot[];
   evaluation: EvaluationConfig;
   goals: Goal[];
   createdAt: string;
+  /** presente quando a disciplina veio de uma sincronização externa (AVA/SUAP) */
+  externalSource?: ExternalSource;
+  externalId?: string;
 }
 
 export interface Activity {
@@ -87,6 +109,9 @@ export interface Activity {
   reminders: number[];
   notificationIds: string[];
   createdAt: string;
+  /** presente quando a atividade veio de uma sincronização externa (AVA) */
+  externalSource?: ExternalSource;
+  externalId?: string;
 }
 
 export interface Exam {
@@ -130,6 +155,28 @@ export interface Settings {
   defaultReminders: number[];
 }
 
+export interface MoodleIntegration {
+  connected: boolean;
+  baseUrl: string;
+  displayName: string;
+  token: string;
+  lastSyncISO: string | null;
+}
+
+export interface SuapIntegration {
+  connected: boolean;
+  baseUrl: string;
+  displayName: string;
+  matricula: string;
+  token: string;
+  lastSyncISO: string | null;
+}
+
+export interface Integrations {
+  moodle: MoodleIntegration | null;
+  suap: SuapIntegration | null;
+}
+
 export interface AppData {
   disciplines: Discipline[];
   activities: Activity[];
@@ -139,4 +186,5 @@ export interface AppData {
   absences: AbsenceEntry[];
   studySessions: StudySession[];
   settings: Settings;
+  integrations: Integrations;
 }

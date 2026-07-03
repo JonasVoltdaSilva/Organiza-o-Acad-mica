@@ -18,6 +18,7 @@ interface FieldProps {
   keyboardType?: KeyboardTypeOptions;
   multiline?: boolean;
   autoFocus?: boolean;
+  secureTextEntry?: boolean;
 }
 
 export function Field({
@@ -28,6 +29,7 @@ export function Field({
   keyboardType,
   multiline,
   autoFocus,
+  secureTextEntry,
 }: FieldProps) {
   const theme = useTheme();
   return (
@@ -43,6 +45,7 @@ export function Field({
         keyboardType={keyboardType}
         multiline={multiline}
         autoFocus={autoFocus}
+        secureTextEntry={secureTextEntry}
         accessibilityLabel={label}
         style={[
           styles.input,

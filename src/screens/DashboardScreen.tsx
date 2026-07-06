@@ -9,10 +9,12 @@ import { ActivityRow } from "../components/cards/ActivityRow";
 import { ExamCard } from "../components/cards/ExamCard";
 import { NextDeadlineCard } from "../components/cards/NextDeadlineCard";
 import { StatTile } from "../components/cards/StatTile";
+import { CollapsibleList } from "../components/ui/CollapsibleList";
 import { EmptyState } from "../components/ui/EmptyState";
 import { GlassCard } from "../components/ui/GlassCard";
 import { PressableScale } from "../components/ui/PressableScale";
 import { ProgressBar } from "../components/ui/ProgressBar";
+import { RiskThermometer } from "../components/ui/RiskThermometer";
 import { Screen } from "../components/ui/Screen";
 import { SectionHeader } from "../components/ui/SectionHeader";
 import { useDashboard } from "../hooks/useDashboard";
@@ -127,6 +129,8 @@ export function DashboardScreen() {
         </View>
       ) : null}
 
+      <RiskThermometer risk={dashboard.overallRisk} size="md" style={styles.riskCard} />
+
       <GlassCard style={styles.semesterCard}>
         <View style={styles.semesterHeader}>
           <Text style={[typography.heading, { color: theme.text }]}>
@@ -165,6 +169,14 @@ export function DashboardScreen() {
           }
           color="#B45FC9"
         />
+        {state.settings.streakEnabled ? (
+          <StatTile
+            icon="flame"
+            label="Streak de estudo"
+            value={`${state.studyStreak.count}d`}
+            color={theme.warning}
+          />
+        ) : null}
       </View>
 
       <SectionHeader title="Sua semana" />
@@ -216,53 +228,52 @@ export function DashboardScreen() {
         actionLabel="Nova"
         onAction={() => navigation.navigate("ActivityForm", {})}
       />
-      {dashboard.overdueActivities.length === 0 &&
-      dashboard.upcomingActivities.length === 0 ? (
-        <EmptyState
-          icon="sparkles"
-          title="Nenhuma atividade pendente"
-          subtitle="Você está em dia. Aproveite para revisar o conteúdo!"
-        />
-      ) : (
-        [...dashboard.overdueActivities, ...dashboard.upcomingActivities]
-          .slice(0, 5)
-          .map((activity) => (
-            <ActivityRow
-              key={activity.id}
-              activity={activity}
-              discipline={disciplineOf(activity.disciplineId)}
-              onToggle={() => toggleActivityCompleted(activity.id)}
-              onDelete={() => deleteActivity(activity.id)}
-              onPress={() =>
-                navigation.navigate("ActivityForm", { activityId: activity.id })
-              }
-            />
-          ))
-      )}
+      <CollapsibleList
+        items={[...dashboard.overdueActivities, ...dashboard.upcomingActivities]}
+        keyExtractor={(activity) => activity.id}
+        emptyState={
+          <EmptyState
+            icon="sparkles"
+            title="Nenhuma atividade pendente"
+            subtitle="Você está em dia. Aproveite para revisar o conteúdo!"
+          />
+        }
+        renderItem={(activity) => (
+          <ActivityRow
+            activity={activity}
+            discipline={disciplineOf(activity.disciplineId)}
+            onToggle={() => toggleActivityCompleted(activity.id)}
+            onDelete={() => deleteActivity(activity.id)}
+            onPress={() =>
+              navigation.navigate("ActivityForm", { activityId: activity.id })
+            }
+          />
+        )}
+      />
 
       <SectionHeader
         title="Próximas provas"
         actionLabel="Nova"
         onAction={() => navigation.navigate("ExamForm", {})}
       />
-      {dashboard.upcomingExams.length === 0 ? (
-        <EmptyState
-          icon="document-text-outline"
-          title="Nenhuma prova agendada"
-          subtitle="Cadastre suas provas para receber lembretes."
-        />
-      ) : (
-        dashboard.upcomingExams
-          .slice(0, 4)
-          .map((exam) => (
-            <ExamCard
-              key={exam.id}
-              exam={exam}
-              discipline={disciplineOf(exam.disciplineId)}
-              onPress={() => navigation.navigate("ExamForm", { examId: exam.id })}
-            />
-          ))
-      )}
+      <CollapsibleList
+        items={dashboard.upcomingExams}
+        keyExtractor={(exam) => exam.id}
+        emptyState={
+          <EmptyState
+            icon="document-text-outline"
+            title="Nenhuma prova agendada"
+            subtitle="Cadastre suas provas para receber lembretes."
+          />
+        }
+        renderItem={(exam) => (
+          <ExamCard
+            exam={exam}
+            discipline={disciplineOf(exam.disciplineId)}
+            onPress={() => navigation.navigate("ExamForm", { examId: exam.id })}
+          />
+        )}
+      />
     </Screen>
   );
 }
@@ -277,13 +288,14 @@ const styles = StyleSheet.create({
   headerText: { flex: 1, gap: 4 },
   headerActions: { flexDirection: "row", gap: spacing.sm },
   iconButton: {
-    width: 42,
-    height: 42,
+    width: 44,
+    height: 44,
     borderRadius: radius.sm,
     alignItems: "center",
     justifyContent: "center",
   },
   heroWrap: { marginBottom: spacing.lg },
+  riskCard: { marginBottom: spacing.lg },
   semesterCard: { marginBottom: spacing.lg, gap: spacing.md },
   semesterHeader: {
     flexDirection: "row",

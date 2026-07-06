@@ -9,12 +9,14 @@ interface SectionHeaderProps {
   title: string;
   actionLabel?: string;
   onAction?: () => void;
+  /** Espaçamento reduzido no topo — usado quando o header não é o primeiro elemento de uma seção. */
+  compact?: boolean;
 }
 
-export function SectionHeader({ title, actionLabel, onAction }: SectionHeaderProps) {
+export function SectionHeader({ title, actionLabel, onAction, compact }: SectionHeaderProps) {
   const theme = useTheme();
   return (
-    <View style={styles.row}>
+    <View style={[styles.row, compact && styles.rowCompact]}>
       <Text style={[typography.heading, { color: theme.text }]}>{title}</Text>
       {actionLabel && onAction ? (
         <PressableScale onPress={onAction}>
@@ -34,6 +36,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginTop: spacing.xxl,
     marginBottom: spacing.md,
+  },
+  rowCompact: {
+    marginTop: spacing.sm,
+    marginBottom: spacing.xs,
   },
   action: { fontWeight: "700" },
 });

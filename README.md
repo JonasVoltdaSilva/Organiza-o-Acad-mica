@@ -1,6 +1,6 @@
 # HubAcad 🎓
 
-Aplicativo mobile de organização acadêmica para estudantes universitários que utilizam o AVA Moodle e o SUAP. Um único lugar para gerenciar toda a vida universitária.
+Aplicativo mobile de organização acadêmica para estudantes universitários. Um único lugar para gerenciar toda a vida universitária.
 
 ## Conceito
 

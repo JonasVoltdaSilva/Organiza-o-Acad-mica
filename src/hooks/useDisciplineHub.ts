@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
 import { useApp } from "../providers/AppProvider";
+import { AcademicRisk, evaluateAcademicRisk } from "../utils/academicRisk";
 import {
   AttendanceSummary,
   summarizeAttendance,
@@ -41,6 +42,7 @@ export interface DisciplineHub {
   absences: AbsenceEntry[];
   attendance: AttendanceSummary;
   grades: GradeSummary;
+  risk: AcademicRisk;
   nextDeadline: NextDeadline | null;
   goalProgress: GoalProgress[];
   studyMinutes: number;
@@ -89,6 +91,7 @@ export function useDisciplineHub(disciplineId: string): DisciplineHub | null {
 
     const attendance = summarizeAttendance(discipline.workloadHours, absences);
     const grades = summarizeGrades(assessments, discipline.evaluation);
+    const risk = evaluateAcademicRisk(attendance, grades, pendingActivities);
 
     const futurePending = pendingActivities.filter(
       (a) => new Date(a.dueISO).getTime() >= now,
@@ -172,6 +175,7 @@ export function useDisciplineHub(disciplineId: string): DisciplineHub | null {
       absences,
       attendance,
       grades,
+      risk,
       nextDeadline,
       goalProgress,
       studyMinutes,

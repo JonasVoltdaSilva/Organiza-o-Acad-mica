@@ -15,7 +15,7 @@ export function emptyData(): AppData {
     absences: [],
     studySessions: [],
     settings: defaultSettings(),
-    integrations: { moodle: null, suap: null },
+    studyStreak: { count: 0, lastDateISO: "" },
   };
 }
 
@@ -28,10 +28,7 @@ export async function loadData(): Promise<AppData> {
     return {
       ...defaults,
       ...parsed,
-      integrations: {
-        ...defaults.integrations,
-        ...(parsed.integrations ?? {}),
-      },
+      settings: { ...defaults.settings, ...(parsed.settings ?? {}) },
     };
   } catch (err) {
     console.warn("[HubAcad] Falha ao carregar dados locais", err);

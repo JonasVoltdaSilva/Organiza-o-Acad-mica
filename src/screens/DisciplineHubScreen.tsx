@@ -4,7 +4,7 @@ import {
   useNavigation,
   useRoute,
 } from "@react-navigation/native";
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { ActivityRow } from "../components/cards/ActivityRow";
@@ -13,11 +13,14 @@ import { NextDeadlineCard } from "../components/cards/NextDeadlineCard";
 import { AttendanceSection } from "../components/hub/AttendanceSection";
 import { GoalsSection } from "../components/hub/GoalsSection";
 import { GradesSection } from "../components/hub/GradesSection";
+import { CollapsibleList } from "../components/ui/CollapsibleList";
 import { EmptyState } from "../components/ui/EmptyState";
 import { GlassCard } from "../components/ui/GlassCard";
 import { PressableScale } from "../components/ui/PressableScale";
+import { RiskThermometer } from "../components/ui/RiskThermometer";
 import { Screen } from "../components/ui/Screen";
 import { SectionHeader } from "../components/ui/SectionHeader";
+import { SegmentedTabItem, SegmentedTabs } from "../components/ui/SegmentedTabs";
 import { useDisciplineHub } from "../hooks/useDisciplineHub";
 import { RootNavigation, RootStackParamList } from "../navigation/types";
 import { useApp } from "../providers/AppProvider";
@@ -27,6 +30,13 @@ import { confirmAction } from "../utils/confirm";
 import { formatShortDate } from "../utils/dates";
 
 type HubRoute = RouteProp<RootStackParamList, "DisciplineHub">;
+
+const HUB_TABS: SegmentedTabItem[] = [
+  { key: "visao-geral", label: "Visão Geral", icon: "speedometer-outline" },
+  { key: "atividades", label: "Atividades & Provas", icon: "checkbox-outline" },
+  { key: "notas", label: "Notas & Frequência", icon: "school-outline" },
+  { key: "anotacoes", label: "Anotações & Objetivos", icon: "create-outline" },
+];
 
 /**
  * Hub da Disciplina — o mini ambiente acadêmico de cada matéria.
@@ -38,6 +48,7 @@ export function DisciplineHubScreen() {
   const route = useRoute<HubRoute>();
   const { toggleActivityCompleted, deleteActivity, deleteDiscipline } = useApp();
   const hub = useDisciplineHub(route.params.disciplineId);
+  const [activeTab, setActiveTab] = useState<string>("visao-geral");
 
   if (!hub) {
     return (
@@ -117,154 +128,182 @@ export function DisciplineHubScreen() {
         ) : null}
       </View>
 
-      {hub.nextDeadline ? (
-        <View style={styles.heroWrap}>
-          <NextDeadlineCard
-            kind={hub.nextDeadline.kind}
-            title={hub.nextDeadline.title}
-            dateISO={hub.nextDeadline.dateISO}
-          />
-        </View>
-      ) : null}
-
-      <SectionHeader
-        title={`Atividades (${hub.pendingActivities.length})`}
-        actionLabel="Nova"
-        onAction={() =>
-          navigation.navigate("ActivityForm", { disciplineId: discipline.id })
-        }
+      <SegmentedTabs
+        tabs={HUB_TABS}
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        style={styles.tabs}
       />
-      {hub.pendingActivities.length === 0 ? (
-        <EmptyState
-          icon="checkmark-done-outline"
-          title="Nenhuma atividade pendente"
-        />
-      ) : (
-        hub.pendingActivities.map((activity) => (
-          <ActivityRow
-            key={activity.id}
-            activity={activity}
-            onToggle={() => toggleActivityCompleted(activity.id)}
-            onDelete={() => deleteActivity(activity.id)}
-            onPress={() =>
-              navigation.navigate("ActivityForm", { activityId: activity.id })
-            }
-          />
-        ))
-      )}
-      {hub.completedActivities.length > 0 ? (
+
+      {activeTab === "visao-geral" ? (
         <>
-          <Text style={[typography.micro, styles.completedLabel, { color: theme.textMuted }]}>
-            CONCLUÍDAS ({hub.completedActivities.length})
-          </Text>
-          {hub.completedActivities.slice(0, 5).map((activity) => (
-            <ActivityRow
-              key={activity.id}
-              activity={activity}
-              onToggle={() => toggleActivityCompleted(activity.id)}
-              onDelete={() => deleteActivity(activity.id)}
-              onPress={() =>
-                navigation.navigate("ActivityForm", { activityId: activity.id })
-              }
-            />
-          ))}
+          <RiskThermometer risk={hub.risk} size="md" style={styles.riskCard} />
+          {hub.nextDeadline ? (
+            <View style={styles.heroWrap}>
+              <NextDeadlineCard
+                kind={hub.nextDeadline.kind}
+                title={hub.nextDeadline.title}
+                dateISO={hub.nextDeadline.dateISO}
+              />
+            </View>
+          ) : null}
         </>
       ) : null}
 
-      <SectionHeader
-        title={`Provas (${hub.upcomingExams.length})`}
-        actionLabel="Nova"
-        onAction={() =>
-          navigation.navigate("ExamForm", { disciplineId: discipline.id })
-        }
-      />
-      {hub.upcomingExams.length === 0 ? (
-        <EmptyState icon="document-text-outline" title="Nenhuma prova agendada" />
-      ) : (
-        hub.upcomingExams.map((exam) => (
-          <ExamCard
-            key={exam.id}
-            exam={exam}
-            onPress={() => navigation.navigate("ExamForm", { examId: exam.id })}
-          />
-        ))
-      )}
-
-      <SectionHeader title="Notas" />
-      <GradesSection
-        discipline={discipline}
-        assessments={hub.assessments}
-        grades={hub.grades}
-      />
-
-      <SectionHeader title="Frequência" />
-      <AttendanceSection
-        discipline={discipline}
-        absences={hub.absences}
-        attendance={hub.attendance}
-      />
-
-      <SectionHeader
-        title={`Anotações (${hub.notes.length})`}
-        actionLabel="Nova"
-        onAction={() =>
-          navigation.navigate("NoteEditor", { disciplineId: discipline.id })
-        }
-      />
-      {hub.notes.length === 0 ? (
-        <EmptyState
-          icon="create-outline"
-          title="Nenhuma anotação"
-          subtitle="Guarde resumos, links e observações desta matéria."
-        />
-      ) : (
-        hub.notes.slice(0, 6).map((note) => (
-          <PressableScale
-            key={note.id}
-            onPress={() =>
-              navigation.navigate("NoteEditor", {
-                noteId: note.id,
-                disciplineId: discipline.id,
-              })
+      {activeTab === "atividades" ? (
+        <>
+          <SectionHeader
+            title={`Atividades (${hub.pendingActivities.length})`}
+            actionLabel="Nova"
+            onAction={() =>
+              navigation.navigate("ActivityForm", { disciplineId: discipline.id })
             }
-            style={styles.noteItem}
-          >
-            <GlassCard padding={spacing.lg}>
-              <View style={styles.noteRow}>
-                {note.pinned ? (
-                  <Ionicons name="pin" size={14} color={discipline.color} />
-                ) : null}
-                <View style={styles.noteBody}>
-                  <Text
-                    style={[typography.body, { color: theme.text, fontWeight: "600" }]}
-                    numberOfLines={1}
-                  >
-                    {note.title || "Sem título"}
-                  </Text>
-                  {note.body ? (
-                    <Text
-                      style={[typography.caption, { color: theme.textMuted }]}
-                      numberOfLines={2}
-                    >
-                      {note.body}
-                    </Text>
-                  ) : null}
-                </View>
-                <Text style={[typography.micro, { color: theme.textMuted }]}>
-                  {formatShortDate(note.updatedAt)}
-                </Text>
-              </View>
-            </GlassCard>
-          </PressableScale>
-        ))
-      )}
+          />
+          <CollapsibleList
+            items={hub.pendingActivities}
+            keyExtractor={(activity) => activity.id}
+            emptyState={
+              <EmptyState
+                icon="checkmark-done-outline"
+                title="Nenhuma atividade pendente"
+              />
+            }
+            renderItem={(activity) => (
+              <ActivityRow
+                activity={activity}
+                onToggle={() => toggleActivityCompleted(activity.id)}
+                onDelete={() => deleteActivity(activity.id)}
+                onPress={() =>
+                  navigation.navigate("ActivityForm", { activityId: activity.id })
+                }
+              />
+            )}
+          />
+          {hub.completedActivities.length > 0 ? (
+            <>
+              <Text style={[typography.micro, styles.completedLabel, { color: theme.textMuted }]}>
+                CONCLUÍDAS ({hub.completedActivities.length})
+              </Text>
+              {hub.completedActivities.slice(0, 5).map((activity) => (
+                <ActivityRow
+                  key={activity.id}
+                  activity={activity}
+                  onToggle={() => toggleActivityCompleted(activity.id)}
+                  onDelete={() => deleteActivity(activity.id)}
+                  onPress={() =>
+                    navigation.navigate("ActivityForm", { activityId: activity.id })
+                  }
+                />
+              ))}
+            </>
+          ) : null}
 
-      <SectionHeader title="Objetivos" />
-      <GoalsSection
-        discipline={discipline}
-        goalProgress={hub.goalProgress}
-        studyMinutes={hub.studyMinutes}
-      />
+          <SectionHeader
+            title={`Provas (${hub.upcomingExams.length})`}
+            actionLabel="Nova"
+            onAction={() =>
+              navigation.navigate("ExamForm", { disciplineId: discipline.id })
+            }
+          />
+          <CollapsibleList
+            items={hub.upcomingExams}
+            keyExtractor={(exam) => exam.id}
+            emptyState={
+              <EmptyState icon="document-text-outline" title="Nenhuma prova agendada" />
+            }
+            renderItem={(exam) => (
+              <ExamCard
+                exam={exam}
+                onPress={() => navigation.navigate("ExamForm", { examId: exam.id })}
+              />
+            )}
+          />
+        </>
+      ) : null}
+
+      {activeTab === "notas" ? (
+        <>
+          <SectionHeader title="Notas" />
+          <GradesSection
+            discipline={discipline}
+            assessments={hub.assessments}
+            grades={hub.grades}
+          />
+
+          <SectionHeader title="Frequência" />
+          <AttendanceSection
+            discipline={discipline}
+            absences={hub.absences}
+            attendance={hub.attendance}
+          />
+        </>
+      ) : null}
+
+      {activeTab === "anotacoes" ? (
+        <>
+          <SectionHeader
+            title={`Anotações (${hub.notes.length})`}
+            actionLabel="Nova"
+            onAction={() =>
+              navigation.navigate("NoteEditor", { disciplineId: discipline.id })
+            }
+          />
+          {hub.notes.length === 0 ? (
+            <EmptyState
+              icon="create-outline"
+              title="Nenhuma anotação"
+              subtitle="Guarde resumos, links e observações desta matéria."
+            />
+          ) : (
+            hub.notes.slice(0, 6).map((note) => (
+              <PressableScale
+                key={note.id}
+                onPress={() =>
+                  navigation.navigate("NoteEditor", {
+                    noteId: note.id,
+                    disciplineId: discipline.id,
+                  })
+                }
+                style={styles.noteItem}
+              >
+                <GlassCard padding={spacing.lg}>
+                  <View style={styles.noteRow}>
+                    {note.pinned ? (
+                      <Ionicons name="pin" size={14} color={discipline.color} />
+                    ) : null}
+                    <View style={styles.noteBody}>
+                      <Text
+                        style={[typography.body, { color: theme.text, fontWeight: "600" }]}
+                        numberOfLines={1}
+                      >
+                        {note.title || "Sem título"}
+                      </Text>
+                      {note.body ? (
+                        <Text
+                          style={[typography.caption, { color: theme.textMuted }]}
+                          numberOfLines={2}
+                        >
+                          {note.body}
+                        </Text>
+                      ) : null}
+                    </View>
+                    <Text style={[typography.micro, { color: theme.textMuted }]}>
+                      {formatShortDate(note.updatedAt)}
+                    </Text>
+                  </View>
+                </GlassCard>
+              </PressableScale>
+            ))
+          )}
+
+          <SectionHeader title="Objetivos" />
+          <GoalsSection
+            discipline={discipline}
+            goalProgress={hub.goalProgress}
+            studyMinutes={hub.studyMinutes}
+          />
+        </>
+      ) : null}
     </Screen>
   );
 }
@@ -278,13 +317,15 @@ const styles = StyleSheet.create({
   },
   navActions: { flexDirection: "row", gap: spacing.sm },
   navButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     borderRadius: radius.sm,
     alignItems: "center",
     justifyContent: "center",
   },
   header: { gap: 4, marginBottom: spacing.xl },
+  tabs: { marginBottom: spacing.lg },
+  riskCard: { marginBottom: spacing.lg },
   headerIcon: {
     width: 58,
     height: 58,

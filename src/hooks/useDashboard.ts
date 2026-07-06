@@ -3,19 +3,33 @@ import { useMemo } from "react";
 
 import { useApp } from "../providers/AppProvider";
 import { Activity, Discipline, Exam } from "../types";
+import {
+  AcademicRisk,
+  evaluateAcademicRisk,
+  OverallRisk,
+  summarizeOverallRisk,
+} from "../utils/academicRisk";
 import { summarizeAttendance } from "../utils/attendance";
 import { summarizeGrades } from "../utils/grades";
+
+export interface DisciplineRiskEntry {
+  discipline: Discipline;
+  risk: AcademicRisk;
+}
 
 export interface DashboardData {
   upcomingActivities: Activity[];
   upcomingExams: Exam[];
   overdueActivities: Activity[];
+  pendingActivities: Activity[];
   todayDisciplines: Discipline[];
   semesterProgress: number;
   semesterDaysLeft: number;
   completionPercent: number;
   averageAttendance: number | null;
   overallAverage: number | null;
+  disciplineRisks: DisciplineRiskEntry[];
+  overallRisk: OverallRisk;
   nextDeadline:
     | { kind: "atividade" | "prova"; title: string; dateISO: string }
     | null;
@@ -59,30 +73,39 @@ export function useDashboard(): DashboardData {
     const done = state.activities.filter((a) => a.completed).length;
     const completionPercent = total > 0 ? (done / total) * 100 : 0;
 
-    const attendances = state.disciplines.map((d) =>
-      summarizeAttendance(
+    const perDiscipline = state.disciplines.map((d) => {
+      const attendance = summarizeAttendance(
         d.workloadHours,
         state.absences.filter((a) => a.disciplineId === d.id),
-      ),
-    );
+      );
+      const grades = summarizeGrades(
+        state.assessments.filter((a) => a.disciplineId === d.id),
+        d.evaluation,
+      );
+      const disciplinePending = pending.filter((a) => a.disciplineId === d.id);
+      const risk = evaluateAcademicRisk(attendance, grades, disciplinePending);
+      return { discipline: d, attendance, grades, risk };
+    });
+
     const averageAttendance =
-      attendances.length > 0
-        ? attendances.reduce((s, a) => s + a.attendancePercent, 0) /
-          attendances.length
+      perDiscipline.length > 0
+        ? perDiscipline.reduce((s, x) => s + x.attendance.attendancePercent, 0) /
+          perDiscipline.length
         : null;
 
-    const averages = state.disciplines
-      .map((d) =>
-        summarizeGrades(
-          state.assessments.filter((a) => a.disciplineId === d.id),
-          d.evaluation,
-        ).partialAverage,
-      )
+    const averages = perDiscipline
+      .map((x) => x.grades.partialAverage)
       .filter((v): v is number => v !== null);
     const overallAverage =
       averages.length > 0
         ? averages.reduce((s, v) => s + v, 0) / averages.length
         : null;
+
+    const disciplineRisks: DisciplineRiskEntry[] = perDiscipline.map((x) => ({
+      discipline: x.discipline,
+      risk: x.risk,
+    }));
+    const overallRisk = summarizeOverallRisk(disciplineRisks.map((x) => x.risk));
 
     const deadlineCandidates = [
       ...upcomingActivities.map((a) => ({
@@ -103,12 +126,15 @@ export function useDashboard(): DashboardData {
       upcomingActivities,
       upcomingExams,
       overdueActivities,
+      pendingActivities: pending,
       todayDisciplines,
       semesterProgress,
       semesterDaysLeft,
       completionPercent,
       averageAttendance,
       overallAverage,
+      disciplineRisks,
+      overallRisk,
       nextDeadline: deadlineCandidates[0] ?? null,
     };
   }, [state]);

@@ -7,6 +7,11 @@ export const MAX_ABSENCE_RATIO = 1 - MIN_ATTENDANCE_RATIO;
 /** Percentual de faltas usadas a partir do qual o app alerta em amarelo. */
 export const ABSENCE_WARNING_RATIO = 0.7;
 
+/** Nº de atividades pendentes atrasadas a partir do qual o risco por atividades vira "alto". */
+export const RISK_OVERDUE_COUNT_THRESHOLD = 3;
+/** Janela (dias) para considerar uma atividade de prioridade alta/urgente como "vencendo em breve". */
+export const RISK_DUE_SOON_DAYS = 2;
+
 export const DEFAULT_PASSING_GRADE = 6;
 export const DEFAULT_MAX_GRADE = 10;
 export const DEFAULT_CLASS_HOURS = 2;
@@ -67,6 +72,7 @@ export function defaultSettings(): Settings {
     theme: "system",
     hapticsEnabled: true,
     defaultReminders: [7 * DAY, 1 * DAY, 3 * HOUR],
+    streakEnabled: false,
   };
 }
 

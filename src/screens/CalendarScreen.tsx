@@ -43,14 +43,17 @@ export function CalendarScreen() {
   const [month, setMonth] = useState(new Date());
   const [selected, setSelected] = useState(new Date());
 
-  const days = useMemo(
-    () =>
-      eachDayOfInterval({
-        start: startOfWeek(startOfMonth(month), { weekStartsOn: 0 }),
-        end: endOfWeek(endOfMonth(month), { weekStartsOn: 0 }),
-      }),
-    [month],
-  );
+  const weeks = useMemo(() => {
+    const days = eachDayOfInterval({
+      start: startOfWeek(startOfMonth(month), { weekStartsOn: 0 }),
+      end: endOfWeek(endOfMonth(month), { weekStartsOn: 0 }),
+    });
+    const chunks: Date[][] = [];
+    for (let i = 0; i < days.length; i += 7) {
+      chunks.push(days.slice(i, i + 7));
+    }
+    return chunks;
+  }, [month]);
 
   const disciplineOf = (id: string) =>
     state.disciplines.find((d) => d.id === id);
@@ -113,58 +116,62 @@ export function CalendarScreen() {
           ))}
         </View>
 
-        <View style={styles.grid}>
-          {days.map((day) => {
-            const inMonth = isSameMonth(day, month);
-            const isSelected = isSameDay(day, selected);
-            const today = isToday(day);
-            const dots = dotsFor(day);
-            return (
-              <PressableScale
-                key={day.toISOString()}
-                onPress={() => setSelected(day)}
-                haptic={null}
-                style={styles.cellWrap}
-              >
-                <View style={styles.cell}>
-                  <View
-                    style={[
-                      styles.dayCircle,
-                      today && { backgroundColor: theme.accent },
-                      isSelected && {
-                        borderWidth: 2,
-                        borderColor: theme.primary,
-                      },
-                    ]}
+        <View>
+          {weeks.map((week, weekIndex) => (
+            <View key={weekIndex} style={styles.weekRow}>
+              {week.map((day) => {
+                const inMonth = isSameMonth(day, month);
+                const isSelected = isSameDay(day, selected);
+                const today = isToday(day);
+                const dots = dotsFor(day);
+                return (
+                  <PressableScale
+                    key={day.toISOString()}
+                    onPress={() => setSelected(day)}
+                    haptic={null}
+                    style={styles.cellWrap}
                   >
-                    <Text
-                      style={[
-                        typography.caption,
-                        {
-                          color: today
-                            ? theme.accentText
-                            : inMonth
-                              ? theme.text
-                              : theme.textMuted,
-                          fontWeight: today || isSelected ? "800" : "600",
-                        },
-                      ]}
-                    >
-                      {format(day, "d")}
-                    </Text>
-                  </View>
-                  <View style={styles.dotsRow}>
-                    {dots.map((color, index) => (
+                    <View style={styles.cell}>
                       <View
-                        key={index}
-                        style={[styles.dot, { backgroundColor: color }]}
-                      />
-                    ))}
-                  </View>
-                </View>
-              </PressableScale>
-            );
-          })}
+                        style={[
+                          styles.dayCircle,
+                          today && { backgroundColor: theme.accent },
+                          isSelected && {
+                            borderWidth: 2,
+                            borderColor: theme.primary,
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            typography.caption,
+                            {
+                              color: today
+                                ? theme.accentText
+                                : inMonth
+                                  ? theme.text
+                                  : theme.textMuted,
+                              fontWeight: today || isSelected ? "800" : "600",
+                            },
+                          ]}
+                        >
+                          {format(day, "d")}
+                        </Text>
+                      </View>
+                      <View style={styles.dotsRow}>
+                        {dots.map((color, index) => (
+                          <View
+                            key={index}
+                            style={[styles.dot, { backgroundColor: color }]}
+                          />
+                        ))}
+                      </View>
+                    </View>
+                  </PressableScale>
+                );
+              })}
+            </View>
+          ))}
         </View>
       </GlassCard>
 
@@ -230,9 +237,9 @@ const styles = StyleSheet.create({
   },
   monthLabel: { textTransform: "capitalize" },
   weekHeader: { flexDirection: "row", marginBottom: spacing.xs },
-  weekHeaderCell: { width: `${100 / 7}%`, textAlign: "center" },
-  grid: { flexDirection: "row", flexWrap: "wrap" },
-  cellWrap: { width: `${100 / 7}%` },
+  weekHeaderCell: { flex: 1, textAlign: "center" },
+  weekRow: { flexDirection: "row" },
+  cellWrap: { flex: 1 },
   cell: {
     alignItems: "center",
     paddingVertical: 3,

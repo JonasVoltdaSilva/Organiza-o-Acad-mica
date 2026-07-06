@@ -100,9 +100,26 @@ export function registerWebPwa(): void {
     window.addEventListener("load", () => {
       navigator.serviceWorker
         .register(new URL("sw.js", base).href)
+        .then((registration) => {
+          // Força checar se existe uma versão nova toda vez que a página
+          // carrega — sem isso, quem já visitou o site pode ficar preso
+          // numa versão antiga por muito tempo (o navegador só recheca o
+          // sw.js sozinho de tempos em tempos).
+          registration.update();
+        })
         .catch((err) =>
           console.warn("[HubAcad] Falha ao registrar service worker", err),
         );
+
+      // Quando uma versão nova assume o controle da página, recarrega uma
+      // vez para o usuário ver o conteúdo atualizado sem precisar saber
+      // que precisa dar refresh manualmente.
+      let reloaded = false;
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        if (reloaded) return;
+        reloaded = true;
+        window.location.reload();
+      });
     });
   }
 }

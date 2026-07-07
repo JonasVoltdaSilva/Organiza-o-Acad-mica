@@ -26,7 +26,7 @@ export function GlassTabBar({ state, navigation }: BottomTabBarProps) {
   // brilho difuso que suja a tela (visível sobretudo no tema escuro).
   const barBackground =
     theme.mode === "dark"
-      ? "rgba(10, 22, 38, 0.85)"
+      ? "rgba(6, 20, 29, 0.86)"
       : "rgba(255, 255, 255, 0.88)";
 
   const content = (

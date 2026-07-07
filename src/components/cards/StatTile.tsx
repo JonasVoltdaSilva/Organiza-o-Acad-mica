@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native";
 
 import { radius, spacing, typography } from "../../theme/layout";
 import { useTheme } from "../../theme/ThemeProvider";
@@ -11,13 +11,14 @@ interface StatTileProps {
   label: string;
   value: string;
   color?: string;
+  style?: StyleProp<ViewStyle>;
 }
 
-export function StatTile({ icon, label, value, color }: StatTileProps) {
+export function StatTile({ icon, label, value, color, style }: StatTileProps) {
   const theme = useTheme();
   const accent = color ?? theme.primary;
   return (
-    <GlassCard padding={spacing.lg} style={styles.tile}>
+    <GlassCard padding={spacing.lg} style={[styles.tile, style]}>
       <View style={[styles.iconWrap, { backgroundColor: `${accent}1F` }]}>
         <Ionicons name={icon} size={18} color={accent} />
       </View>

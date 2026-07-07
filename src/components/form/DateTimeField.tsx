@@ -108,6 +108,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
     minHeight: 48,
+    // Na web o <input> tem largura mínima intrínseca e não encolhe;
+    // sem isto o campo de hora vaza para fora da tela.
+    minWidth: 0,
   },
   dateInput: { flex: 3 },
   timeInput: { flex: 2 },

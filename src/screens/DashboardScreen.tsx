@@ -143,11 +143,13 @@ export function DashboardScreen() {
         <ProgressBar progress={dashboard.semesterProgress} />
       </GlassCard>
 
+      {/* Com o streak ligado são 4 tiles: vira grade 2×2 para não espremer. */}
       <View style={styles.tilesRow}>
         <StatTile
           icon="checkmark-done"
           label="Atividades concluídas"
           value={`${Math.round(dashboard.completionPercent)}%`}
+          style={state.settings.streakEnabled && styles.tileHalf}
         />
         <StatTile
           icon="pie-chart"
@@ -158,6 +160,7 @@ export function DashboardScreen() {
               : "–"
           }
           color={theme.info}
+          style={state.settings.streakEnabled && styles.tileHalf}
         />
         <StatTile
           icon="ribbon"
@@ -167,7 +170,8 @@ export function DashboardScreen() {
               ? dashboard.overallAverage.toFixed(1).replace(".", ",")
               : "–"
           }
-          color="#B45FC9"
+          color={theme.primary}
+          style={state.settings.streakEnabled && styles.tileHalf}
         />
         {state.settings.streakEnabled ? (
           <StatTile
@@ -175,6 +179,7 @@ export function DashboardScreen() {
             label="Streak de estudo"
             value={`${state.studyStreak.count}d`}
             color={theme.warning}
+            style={styles.tileHalf}
           />
         ) : null}
       </View>
@@ -302,7 +307,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  tilesRow: { flexDirection: "row", gap: spacing.md },
+  tilesRow: { flexDirection: "row", flexWrap: "wrap", gap: spacing.md },
+  tileHalf: { flexBasis: "42%", flexGrow: 1 },
   weekRow: { flexDirection: "row", justifyContent: "space-between" },
   weekDay: {
     flex: 1,

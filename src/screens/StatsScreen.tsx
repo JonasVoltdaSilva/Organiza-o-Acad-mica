@@ -12,6 +12,7 @@ import { useApp } from "../providers/AppProvider";
 import { spacing, typography } from "../theme/layout";
 import { useTheme } from "../theme/ThemeProvider";
 import { summarizeAttendance } from "../utils/attendance";
+import { lighten } from "../utils/color";
 import { formatGrade, summarizeGrades } from "../utils/grades";
 
 interface DisciplineStat {
@@ -27,6 +28,10 @@ export function StatsScreen() {
   const theme = useTheme();
   const { state } = useApp();
   const dashboard = useDashboard();
+
+  // Cores escuras de disciplina (navy, azul) somem no tema escuro.
+  const displayColor = (color: string) =>
+    theme.mode === "dark" ? lighten(color, 0.3) : color;
 
   const stats = useMemo<DisciplineStat[]>(
     () =>
@@ -124,7 +129,7 @@ export function StatsScreen() {
                   MAIS ATIVIDADES
                 </Text>
                 <Text
-                  style={[typography.body, styles.highlightName, { color: mostActivities.color }]}
+                  style={[typography.body, styles.highlightName, { color: displayColor(mostActivities.color) }]}
                   numberOfLines={1}
                 >
                   {mostActivities.name}
@@ -140,7 +145,7 @@ export function StatsScreen() {
                   MENOR FREQUÊNCIA
                 </Text>
                 <Text
-                  style={[typography.body, styles.highlightName, { color: lowestAttendance.color }]}
+                  style={[typography.body, styles.highlightName, { color: displayColor(lowestAttendance.color) }]}
                   numberOfLines={1}
                 >
                   {lowestAttendance.name}
@@ -156,7 +161,7 @@ export function StatsScreen() {
                   MAIOR NOTA
                 </Text>
                 <Text
-                  style={[typography.body, styles.highlightName, { color: bestAverage.color }]}
+                  style={[typography.body, styles.highlightName, { color: displayColor(bestAverage.color) }]}
                   numberOfLines={1}
                 >
                   {bestAverage.name}
@@ -185,7 +190,7 @@ export function StatsScreen() {
                 </View>
                 <ProgressBar
                   progress={stat.activityCount / maxActivityCount}
-                  color={stat.color}
+                  color={displayColor(stat.color)}
                   height={10}
                 />
               </View>
@@ -214,7 +219,7 @@ export function StatsScreen() {
                       ? theme.danger
                       : stat.attendancePercent < 82
                         ? theme.warning
-                        : stat.color
+                        : displayColor(stat.color)
                   }
                   height={10}
                 />

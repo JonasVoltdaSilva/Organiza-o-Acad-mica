@@ -53,25 +53,27 @@ export const lightTheme: Theme = {
   blurIntensity: 46,
 };
 
+// Tema escuro azul-petróleo com acentos verdes — as superfícies levam um
+// leve tom verde-água para toda a interface viver na família azul + verde.
 export const darkTheme: Theme = {
   mode: "dark",
-  background: "#0A1626",
-  backgroundGradient: ["#0C1B2E", "#081120"],
-  surface: "rgba(255, 255, 255, 0.10)",
-  surfaceStrong: "rgba(255, 255, 255, 0.14)",
-  surfaceBorder: "rgba(255, 255, 255, 0.16)",
+  background: "#06141D",
+  backgroundGradient: ["#0A2231", "#050F17"],
+  surface: "rgba(133, 210, 196, 0.07)",
+  surfaceStrong: "rgba(133, 210, 196, 0.11)",
+  surfaceBorder: "rgba(152, 222, 208, 0.16)",
   text: brand.cream,
   textSecondary: "rgba(246, 247, 237, 0.74)",
   textMuted: "rgba(246, 247, 237, 0.55)",
   accent: brand.lime,
   accentText: brand.navy,
   primary: brand.green,
-  primarySoft: "rgba(116, 195, 101, 0.14)",
+  primarySoft: "rgba(116, 195, 101, 0.15)",
   success: brand.green,
   warning: "#E8B93B",
   danger: "#E07370",
-  info: "#6C9BE0",
-  shadow: "rgba(0, 0, 0, 0.45)",
+  info: "#5FB0DD",
+  shadow: "rgba(0, 0, 0, 0.5)",
   blurTint: "dark",
   blurIntensity: 34,
 };

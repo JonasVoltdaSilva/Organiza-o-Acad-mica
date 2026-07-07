@@ -1,3 +1,4 @@
+import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated, {
@@ -8,6 +9,7 @@ import Animated, {
 
 import { radius } from "../../theme/layout";
 import { useTheme } from "../../theme/ThemeProvider";
+import { lighten } from "../../utils/color";
 
 interface ProgressBarProps {
   /** 0–1 */
@@ -40,22 +42,18 @@ export function ProgressBar({ progress, color, height = 8 }: ProgressBarProps) {
         { height, borderRadius: radius.pill, backgroundColor: theme.primarySoft },
       ]}
     >
-      <Animated.View
-        style={[
-          styles.fill,
-          fillStyle,
-          {
-            height,
-            borderRadius: radius.pill,
-            backgroundColor: color ?? theme.primary,
-          },
-        ]}
-      />
+      <Animated.View style={[fillStyle, { height, borderRadius: radius.pill }]}>
+        {/* Preenchimento com leve gradiente vertical para dar relevo à barra. */}
+        <LinearGradient
+          colors={[lighten(color ?? theme.primary, 0.25), color ?? theme.primary]}
+          style={[styles.fill, { borderRadius: radius.pill }]}
+        />
+      </Animated.View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   track: { width: "100%", overflow: "hidden" },
-  fill: {},
+  fill: { width: "100%", height: "100%" },
 });

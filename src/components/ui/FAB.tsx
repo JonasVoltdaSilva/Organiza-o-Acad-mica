@@ -4,6 +4,7 @@ import React from "react";
 import { StyleSheet } from "react-native";
 
 import { brand } from "../../theme/palette";
+import { useTheme } from "../../theme/ThemeProvider";
 import { PressableScale } from "./PressableScale";
 
 interface FABProps {
@@ -12,14 +13,15 @@ interface FABProps {
   bottom?: number;
 }
 
-export function FAB({ onPress, icon = "add", bottom = 108 }: FABProps) {
+export function FAB({ onPress, icon = "add", bottom = 126 }: FABProps) {
+  const theme = useTheme();
   return (
     <PressableScale
       onPress={onPress}
       haptic={Haptics.ImpactFeedbackStyle.Medium}
-      style={[styles.fab, { bottom }]}
+      style={[styles.fab, { bottom, backgroundColor: theme.primary }]}
     >
-      <Ionicons name={icon} size={28} color={brand.navy} />
+      <Ionicons name={icon} size={28} color="#FFFFFF" />
     </PressableScale>
   );
 }
@@ -31,7 +33,6 @@ const styles = StyleSheet.create({
     width: 58,
     height: 58,
     borderRadius: 29,
-    backgroundColor: brand.lime,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: brand.navy,

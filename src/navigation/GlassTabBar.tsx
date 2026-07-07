@@ -21,6 +21,14 @@ export function GlassTabBar({ state, navigation }: BottomTabBarProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
 
+  // Fundo quase opaco na cor do app: com superfícies muito translúcidas o
+  // blur "esfuma" conteúdo colorido que passa por trás da barra, criando um
+  // brilho difuso que suja a tela (visível sobretudo no tema escuro).
+  const barBackground =
+    theme.mode === "dark"
+      ? "rgba(10, 22, 38, 0.85)"
+      : "rgba(255, 255, 255, 0.88)";
+
   const content = (
     <View style={styles.row}>
       {state.routes.map((route, index) => {
@@ -68,11 +76,14 @@ export function GlassTabBar({ state, navigation }: BottomTabBarProps) {
   const shellStyle = [
     styles.shell,
     {
-      bottom: Math.max(insets.bottom, spacing.md),
+      // Sempre respira acima da home bar do iOS: safe area + folga fixa,
+      // para o toque na aba não disputar espaço com o gesto do sistema.
+      bottom: Math.max(insets.bottom, spacing.sm) + spacing.md,
       borderColor: theme.surfaceBorder,
       shadowColor: theme.shadow,
-      backgroundColor:
-        Platform.OS === "android" ? theme.surfaceStrong : "transparent",
+      // No shell (e não no BlurView, que sobrescreve o próprio background):
+      // assim vale em todas as plataformas e atenua o conteúdo atrás da barra.
+      backgroundColor: barBackground,
     },
   ];
 
@@ -83,9 +94,9 @@ export function GlassTabBar({ state, navigation }: BottomTabBarProps) {
   return (
     <View style={shellStyle}>
       <BlurView
-        intensity={theme.blurIntensity + 20}
+        intensity={theme.blurIntensity}
         tint={theme.blurTint}
-        style={[styles.blur, { backgroundColor: theme.surface }]}
+        style={styles.blur}
       >
         {content}
       </BlurView>
@@ -101,10 +112,10 @@ const styles = StyleSheet.create({
     borderRadius: radius.xl,
     borderWidth: 1,
     overflow: "hidden",
-    shadowOffset: { width: 0, height: 12 },
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 1,
-    shadowRadius: 28,
-    elevation: 10,
+    shadowRadius: 12,
+    elevation: 8,
   },
   blur: { width: "100%" },
   row: {

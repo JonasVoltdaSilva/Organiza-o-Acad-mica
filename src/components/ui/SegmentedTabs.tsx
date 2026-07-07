@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from "react";
 import {
   Platform,
   Pressable,
+  ScrollView,
   StyleProp,
   StyleSheet,
   Text,
@@ -59,15 +60,22 @@ export function SegmentedTabs({ tabs, activeKey, onChange, style }: SegmentedTab
     };
   }, [tabs, onChange]);
 
+  // Carrossel horizontal: cada aba ocupa sua largura natural (nunca trunca);
+  // com folga sobrando, flexGrow distribui o espaço extra entre as abas.
   return (
-    <View
-      accessibilityRole="tablist"
-      style={[
-        styles.shell,
-        { backgroundColor: theme.surfaceStrong, borderColor: theme.surfaceBorder },
-        style,
-      ]}
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={style}
+      contentContainerStyle={styles.scrollContent}
     >
+      <View
+        accessibilityRole="tablist"
+        style={[
+          styles.shell,
+          { backgroundColor: theme.surfaceStrong, borderColor: theme.surfaceBorder },
+        ]}
+      >
       {tabs.map((tab, index) => {
         const active = tab.key === activeKey;
         return (
@@ -110,12 +118,15 @@ export function SegmentedTabs({ tabs, activeKey, onChange, style }: SegmentedTab
           </Pressable>
         );
       })}
-    </View>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  scrollContent: { flexGrow: 1 },
   shell: {
+    flex: 1,
     flexDirection: "row",
     borderWidth: 1,
     borderRadius: radius.md,
@@ -123,14 +134,15 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
   },
   tab: {
-    flex: 1,
+    flexGrow: 1,
+    flexShrink: 0,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
     minHeight: 44,
     borderRadius: radius.sm,
-    paddingHorizontal: spacing.sm,
+    paddingHorizontal: spacing.md,
   },
   label: { fontWeight: "700" },
 });

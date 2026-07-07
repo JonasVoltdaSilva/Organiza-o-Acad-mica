@@ -9,6 +9,8 @@ import Animated, {
 
 import { useApp } from "../../providers/AppProvider";
 
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
 interface PressableScaleProps {
   children: React.ReactNode;
   onPress?: () => void;
@@ -34,8 +36,11 @@ export function PressableScale({
     transform: [{ scale: scale.value }],
   }));
 
+  // O style vai no próprio Pressable: quando ele é filho de um flex row
+  // (ex.: células do calendário com flex:1), o wrapper precisa carregar o
+  // flex — num inner View o flex não propaga e a célula encolhe ao texto.
   return (
-    <Pressable
+    <AnimatedPressable
       accessibilityRole="button"
       disabled={disabled}
       onPressIn={() => {
@@ -51,8 +56,9 @@ export function PressableScale({
         onPress?.();
       }}
       onLongPress={onLongPress}
+      style={[animatedStyle, style]}
     >
-      <Animated.View style={[animatedStyle, style]}>{children}</Animated.View>
-    </Pressable>
+      {children}
+    </AnimatedPressable>
   );
 }

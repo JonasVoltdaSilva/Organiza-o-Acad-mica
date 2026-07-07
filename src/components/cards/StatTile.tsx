@@ -25,7 +25,7 @@ export function StatTile({ icon, label, value, color }: StatTileProps) {
         {value}
       </Text>
       <Text
-        style={[typography.micro, { color: theme.textMuted }]}
+        style={[typography.micro, styles.label, { color: theme.textMuted }]}
         numberOfLines={2}
       >
         {label.toUpperCase()}
@@ -35,7 +35,8 @@ export function StatTile({ icon, label, value, color }: StatTileProps) {
 }
 
 const styles = StyleSheet.create({
-  tile: { flex: 1, gap: spacing.xs },
+  tile: { flex: 1, gap: spacing.sm, minHeight: 120 },
+  label: { fontSize: 10, lineHeight: 14 },
   iconWrap: {
     width: 34,
     height: 34,

@@ -28,6 +28,7 @@ import { RootNavigation } from "../navigation/types";
 import { useApp } from "../providers/AppProvider";
 import { radius, spacing, typography } from "../theme/layout";
 import { useTheme } from "../theme/ThemeProvider";
+import { lighten } from "../utils/color";
 
 function holidayName(date: Date): string | null {
   const holiday = FIXED_HOLIDAYS.find(
@@ -58,6 +59,11 @@ export function CalendarScreen() {
   const disciplineOf = (id: string) =>
     state.disciplines.find((d) => d.id === id);
 
+  // No tema escuro, cores saturadas escuras (navy, azul) somem contra o
+  // fundo azul-marinho — clareamos os indicadores para manter o contraste.
+  const dotColor = (color: string) =>
+    theme.mode === "dark" ? lighten(color, 0.35) : color;
+
   const dotsFor = (day: Date): string[] => {
     const colors = new Set<string>();
     for (const activity of state.activities) {
@@ -71,7 +77,7 @@ export function CalendarScreen() {
       }
     }
     if (holidayName(day)) colors.add(theme.warning);
-    return Array.from(colors).slice(0, 3);
+    return Array.from(colors, dotColor).slice(0, 3);
   };
 
   const dayActivities = state.activities.filter((a) =>
@@ -255,11 +261,11 @@ const styles = StyleSheet.create({
   dotsRow: {
     flexDirection: "row",
     gap: 3,
-    height: 6,
+    height: 8,
     marginTop: 1,
     alignItems: "center",
   },
-  dot: { width: 5, height: 5, borderRadius: 3 },
+  dot: { width: 6, height: 6, borderRadius: 3 },
   holidayCard: { marginBottom: spacing.md },
   holidayRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
 });

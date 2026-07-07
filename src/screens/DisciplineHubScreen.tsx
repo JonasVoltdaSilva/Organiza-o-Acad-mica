@@ -33,9 +33,9 @@ type HubRoute = RouteProp<RootStackParamList, "DisciplineHub">;
 
 const HUB_TABS: SegmentedTabItem[] = [
   { key: "visao-geral", label: "Visão Geral", icon: "speedometer-outline" },
-  { key: "atividades", label: "Atividades & Provas", icon: "checkbox-outline" },
-  { key: "notas", label: "Notas & Frequência", icon: "school-outline" },
-  { key: "anotacoes", label: "Anotações & Objetivos", icon: "create-outline" },
+  { key: "atividades", label: "Atividades", icon: "checkbox-outline" },
+  { key: "notas", label: "Notas", icon: "school-outline" },
+  { key: "anotacoes", label: "Anotações", icon: "create-outline" },
 ];
 
 /**

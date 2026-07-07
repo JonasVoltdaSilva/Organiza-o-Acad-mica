@@ -18,7 +18,7 @@ export function Screen({
   children,
   scroll = true,
   style,
-  bottomInset = 110,
+  bottomInset = 128,
 }: ScreenProps) {
   const theme = useTheme();
   const insets = useSafeAreaInsets();

@@ -1,5 +1,4 @@
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
@@ -27,13 +26,7 @@ export function NextDeadlineCard({
 }: NextDeadlineCardProps) {
   return (
     <PressableScale onPress={onPress}>
-      {/* Gradiente verde diagonal: profundidade sem sair da cor da marca. */}
-      <LinearGradient
-        colors={["#0B9D62", "#00663D"]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.card}
-      >
+      <View style={styles.card}>
         <View style={styles.badgeRow}>
           <View style={styles.badge}>
             <Ionicons
@@ -51,21 +44,20 @@ export function NextDeadlineCard({
           {title}
         </Text>
         <Text style={styles.date}>{formatFullDate(dateISO)}</Text>
-      </LinearGradient>
+      </View>
     </PressableScale>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
+    backgroundColor: brand.greenDark,
     borderRadius: radius.xl,
     padding: spacing.xl,
     gap: spacing.sm,
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.22)",
     shadowColor: brand.navy,
     shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.16,
     shadowRadius: 22,
     elevation: 6,
   },
